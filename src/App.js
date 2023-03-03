@@ -1,23 +1,45 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
+
+  const [images, setImages] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedImage(null);
+  };
+
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/photos")
+      .then((response) => response.json())
+      .then((data) => setImages(data))
+      .catch((error) => console.error("Error while calling api", error))
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="image-grid">
+      {images.map((image) => (
+        <div className="image-card" key={image.id}>
+          <img
+            src={image.thumbnailUrl}
+            alt={image.id}
+            onClick={() => handleImageClick(image)}
+          />
+          <div className="image-details">
+            <h3>{image.title}</h3>
+          </div>
+        </div>
+      ))}
+      {selectedImage && (
+        <div className="modal" onClick={handleCloseModal}>
+          <img src={selectedImage.url} alt={selectedImage.id} />
+        </div>
+      )}
     </div>
   );
 }
